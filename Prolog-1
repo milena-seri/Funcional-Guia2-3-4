@@ -1,0 +1,99 @@
+% filepath: c:\Users\elcha\paradigmaUAP2025\logico\ejercicios\Ejercicio1\ejercicios.pl
+
+% ========================================
+% 1. Conversión de temperatura
+% ========================================
+
+celsius_to_fahrenheit(C, F) :-
+    F is C * 9/5 + 32.
+
+fahrenheit_to_celsius(F, C) :-
+    C is (F - 32) * 5/9.
+
+% ========================================
+% 2. Recursión - vuelos
+% ========================================
+
+% Base de datos de vuelos directos
+flight(london, paris, 80).
+flight(paris, rome, 120).
+flight(rome, athens, 150).
+flight(london, berlin, 90).
+flight(berlin, athens, 180).
+
+% Vuelo directo entre dos ciudades
+direct_flight(City1, City2) :-
+    flight(City1, City2, _).
+
+% Alcanzabilidad con recursión
+reachable(City1, City2) :-
+    direct_flight(City1, City2).
+
+reachable(City1, City2) :-
+    direct_flight(City1, Intermediate),
+    reachable(Intermediate, City2).
+
+% ========================================
+% 3. Operador de corte - Piedra papel o tijera
+% ========================================
+
+% Qué elemento le gana a cuál
+beats(rock, scissors).
+beats(scissors, paper).
+beats(paper, rock).
+
+% Determina el ganador entre dos elecciones
+winner(Choice1, Choice2, player1) :-
+    beats(Choice1, Choice2), !.
+
+winner(Choice1, Choice2, player2) :-
+    beats(Choice2, Choice1), !.
+
+winner(_, _, draw).
+
+% Juego completo con nombres de jugadores
+play_game(Player1, Choice1, Player2, Choice2, Winner) :-
+    winner(Choice1, Choice2, Result),
+    (   Result = player1 -> Winner = Player1
+    ;   Result = player2 -> Winner = Player2
+    ;   Winner = draw
+    ), !.
+
+% ========================================
+% 4. Operador de corte - Descuentos
+% ========================================
+
+% Versión SIN corte (incorrecta - genera múltiples soluciones)
+discount_without_cut(Amount, 20) :-
+    Amount >= 1000.
+
+discount_without_cut(Amount, 10) :-
+    Amount >= 500.
+
+discount_without_cut(_, 5).
+
+% Versión CON corte (correcta - solo una solución)
+discount_with_cut(Amount, 20) :-
+    Amount >= 1000, !.
+
+discount_with_cut(Amount, 10) :-
+    Amount >= 500, !.
+
+discount_with_cut(_, 5).
+
+% ========================================
+% 6. Temperaturas bidireccional
+% ========================================
+
+% Predicado bidireccional usando nonvar
+temperature(celsius(C), fahrenheit(F)) :-
+    nonvar(C), !,
+    F is C * 9/5 + 32.
+
+temperature(celsius(C), fahrenheit(F)) :-
+    nonvar(F), !,
+    C is (F - 32) * 5/9.
+
+temperature(celsius(_), fahrenheit(_)) :-
+    write('Error: Al menos una temperatura debe estar instanciada'), 
+    fail.
